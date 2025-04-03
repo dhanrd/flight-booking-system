@@ -76,7 +76,7 @@ cd ../frontend
 npm install
 
 # start development server
-npm start
+npm run dev
 ```
 
 ## updating the database
