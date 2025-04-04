@@ -115,5 +115,10 @@ CREATE TABLE Payment (
     FOREIGN KEY (BookingID) REFERENCES Booking(BookingID) ON DELETE CASCADE
 );
 
+-- Add missing is_active to User table
+ALTER TABLE User
+ADD COLUMN is_active BOOLEAN;
 
-
+-- Add missing is_admin to User table
+ALTER TABLE user
+ADD COLUMN is_admin BOOLEAN;
