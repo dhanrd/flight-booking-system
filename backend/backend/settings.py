@@ -135,3 +135,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True  # Only for development, restrict in production
+
+AUTH_USER_MODEL = 'api.User'
+
+# Simple authentication settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_PERMISSION_CLASSES': [],
+}
+
+MIGRATION_MODULES = {
+    'api': None,
+}

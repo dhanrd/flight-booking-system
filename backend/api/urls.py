@@ -10,4 +10,6 @@ router.register(r'tickets', views.TicketViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('register/', views.RegisterView.as_view(), name='register'),
+    path('login/', views.LoginView.as_view(), name='login'),
 ]

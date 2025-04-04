@@ -1,31 +1,93 @@
-# api/models.py
 from django.db import models
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
-class User(models.Model):
-    UserID = models.AutoField(primary_key=True)
-    FirstName = models.CharField(max_length=50)
-    LastName = models.CharField(max_length=50)
-    DateOfBirth = models.DateField(null=True, blank=True)
-    PhoneNumber = models.CharField(max_length=15, null=True, blank=True)
-    Email = models.EmailField(max_length=100, unique=True)
+class UserManager(BaseUserManager):
+    def create_user(self, email, password=None, first_name=None, last_name=None, **extra_fields):
+        if not email:
+            raise ValueError('Users must have an email address')
+        
+        user = self.model(
+            email=self.normalize_email(email),
+            first_name=first_name,
+            last_name=last_name,
+            **extra_fields
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+class User(AbstractBaseUser):
+    UserID = models.AutoField(primary_key=True, db_column='UserID')
+    first_name = models.CharField(max_length=50, db_column='FirstName')
+    last_name = models.CharField(max_length=50, db_column='LastName')
+    date_of_birth = models.DateField(null=True, blank=True, db_column='DateOfBirth')
+    phone_number = models.CharField(max_length=15, blank=True, db_column='PhoneNumber')
+    email = models.EmailField(unique=True, db_column='Email')
+    password = models.CharField(max_length=128, db_column='Password')
+    
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+    
+    last_login = None
+    is_active = None
+    is_admin = None
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name']
+
+    objects = UserManager()
 
     class Meta:
         managed = False
         db_table = 'User'
 
+    def set_password(self, raw_password):
+        self.password = raw_password
+        self.save()
+
+    def check_password(self, raw_password):
+        return self.password == raw_password
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
 class Admin(models.Model):
-    AdminID = models.OneToOneField(User, models.CASCADE, primary_key=True, db_column='AdminID')
-    AuthorizationLevel = models.CharField(max_length=50)
+    AdminID = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        db_column='AdminID'
+    )
+    authorization_level = models.CharField(max_length=50)
 
     class Meta:
         managed = False
         db_table = 'Admin'
 
 class Passenger(models.Model):
-    PassengerID = models.OneToOneField(User, models.CASCADE, primary_key=True, db_column='PassengerID')
-    PassportNumber = models.CharField(max_length=20, unique=True, null=True, blank=True)
-    LoyaltyNumber = models.CharField(max_length=20, unique=True, null=True, blank=True)
-    Status = models.CharField(max_length=20, null=True, blank=True)
+    PassengerID = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        db_column='PassengerID'
+    )
+    PassportNumber = models.CharField(
+        max_length=20, 
+        unique=True, 
+        null=True, 
+        blank=True
+    )
+    LoyaltyNumber = models.CharField(
+        max_length=20, 
+        unique=True, 
+        null=True, 
+        blank=True
+    )
+    Status = models.CharField(
+        max_length=20, 
+        default="Active"
+    )
 
     class Meta:
         managed = False

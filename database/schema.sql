@@ -14,7 +14,8 @@ CREATE TABLE User (
     LastName VARCHAR(50) NOT NULL,
     DateOfBirth DATE,
     PhoneNumber VARCHAR(15),
-    Email VARCHAR(100) UNIQUE NOT NULL
+    Email VARCHAR(100) UNIQUE NOT NULL,
+    Password VARCHAR(256) NOT NULL
 );
 
 -- Admin Table (Specialized user role)
