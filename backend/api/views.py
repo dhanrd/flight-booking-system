@@ -12,7 +12,9 @@ class RegisterView(APIView):
             'email': request.data.get('email'),
             'password': request.data.get('password'),
             'first_name': request.data.get('first_name'),
-            'last_name': request.data.get('last_name')
+            'last_name': request.data.get('last_name'),
+            'date_of_birth': request.data.get('date_of_birth'),
+            'phone_number': request.data.get('phone_number')
         }
         
         passenger_data = {
