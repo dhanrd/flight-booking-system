@@ -22,6 +22,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, first_name=None, last_name=None, date_of_birth=None, phone_number=None, **extra_fields):
       extra_fields.setdefault('is_admin', True)
       user = self.create_user(email, password, first_name, last_name, date_of_birth, phone_number, **extra_fields)
+      Admin.objects.create(AdminID=user) # add superuser to the Admin table once created
       return user
 
 class User(AbstractBaseUser):
@@ -66,7 +67,7 @@ class Admin(models.Model):
         primary_key=True,
         db_column='AdminID'
     )
-    authorization_level = models.CharField(max_length=50)
+    authorization_level = models.CharField(max_length=50, db_column="AuthorizationLevel") # link to MySQL database
 
     class Meta:
         managed = False
