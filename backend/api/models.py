@@ -18,6 +18,11 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
+    
+    def create_superuser(self, email, password=None, first_name=None, last_name=None, date_of_birth=None, phone_number=None, **extra_fields):
+      extra_fields.setdefault('is_admin', True)
+      user = self.create_user(email, password, first_name, last_name, date_of_birth, phone_number, **extra_fields)
+      return user
 
 class User(AbstractBaseUser):
     UserID = models.AutoField(primary_key=True, db_column='UserID')
@@ -32,8 +37,8 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     
     last_login = None
-    is_active = None
-    is_admin = None
+    # is_active = None
+    # is_admin = None
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
