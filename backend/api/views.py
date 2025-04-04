@@ -7,23 +7,34 @@ from .serializers import BookingSerializer, TicketSerializer, UserSerializer, Pa
 
 class RegisterView(APIView):
     def post(self, request):
+        # Separate user and passenger data
+        user_data = {
+            'email': request.data.get('email'),
+            'password': request.data.get('password'),
+            'first_name': request.data.get('first_name'),
+            'last_name': request.data.get('last_name')
+        }
+        
+        passenger_data = {
+            'PassportNumber': request.data.get('passport_number'),
+            'LoyaltyNumber': request.data.get('loyalty_number'),
+            'Status': request.data.get('status', 'Active')  # Default active
+        }
+
         # Create User
-        user_serializer = UserSerializer(data=request.data)
+        user_serializer = UserSerializer(data=user_data)
         if not user_serializer.is_valid():
             return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
         user = user_serializer.save()
 
-        # Create Passenger
-        passenger_data = {
-            'PassengerID': user.UserID,
-            'Status': 'Active'
-        }
+        # Create Passenger with the user's ID
+        passenger_data['PassengerID'] = user.UserID
         passenger_serializer = PassengerSerializer(data=passenger_data)
         
         if passenger_serializer.is_valid():
             try:
-                passenger = passenger_serializer.save()
+                passenger_serializer.save()
                 return Response({
                     'user': user_serializer.data,
                     'passenger': passenger_serializer.data
