@@ -26,6 +26,30 @@ class UserManager(BaseUserManager):
       Admin.objects.create(AdminID=user) # add superuser to the Admin table once created
       return user
 
+class FlightManager(models.Manager):
+  # Define a custom method to create flights associated with a given aircraft
+  def create_flight(self, aircraft_id, flight_id=None, flight_number=None, departure_airport=None, arrival_airport=None, 
+                    departure_time=None, arrival_time=None):
+    
+    # Check if an aircraft is associated with the given flight
+    if not aircraft_id:
+      raise ValueError("Flights must have an associated Aircraft")
+    
+    # Instantiate an unsaved instance of the Flight model (Flight Class constructor)
+    flight = self.model(
+      FlightID=flight_id,
+      FlightNumber=flight_number,
+      DepartureAirport=departure_airport,
+      ArrivalAirport=arrival_airport,
+      DepartureTime=departure_time,
+      ArrivalTime=arrival_time,
+      AircraftID=aircraft_id
+    )
+    
+    flight.save(self._db)
+    return flight
+    
+
 class User(AbstractBaseUser):
     UserID = models.AutoField(primary_key=True, db_column='UserID')
     first_name = models.CharField(max_length=50, db_column='FirstName')
@@ -126,6 +150,8 @@ class Flight(models.Model):
     DepartureTime = models.DateTimeField()
     ArrivalTime = models.DateTimeField()
     AircraftID = models.ForeignKey(Aircraft, models.CASCADE, db_column='AircraftID')
+    
+    objects = FlightManager() # flight-specific manager
 
     class Meta:
         managed = False
