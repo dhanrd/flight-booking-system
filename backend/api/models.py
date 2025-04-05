@@ -30,11 +30,7 @@ class FlightManager(models.Manager):
   # Define a custom method to create flights associated with a given aircraft
   def create_flight(self, aircraft_id, flight_id=None, flight_number=None, departure_airport=None, arrival_airport=None, 
                     departure_time=None, arrival_time=None):
-    
-    # Check if an aircraft is associated with the given flight
-    if not aircraft_id:
-      raise ValueError("Flights must have an associated Aircraft")
-    
+     
     # Instantiate an unsaved instance of the Flight model (Flight Class constructor)
     flight = self.model(
       FlightID=flight_id,
