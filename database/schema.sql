@@ -122,3 +122,15 @@ ADD COLUMN is_active BOOLEAN;
 -- Add missing is_admin to User table
 ALTER TABLE user
 ADD COLUMN is_admin BOOLEAN;
+
+-- Add missing is_staff to User table
+ALTER TABLE user
+ADD COLUMN is_staff BOOLEAN;
+
+-- Add missing has_module_perms to User table
+ALTER TABLE user
+ADD COLUMN has_module_perms BOOLEAN;
+
+-- Remove has_module_perns after debugging session
+ALTER TABLE user
+DROP COLUMN has_module_perms;

@@ -21,6 +21,7 @@ class UserManager(BaseUserManager):
     
     def create_superuser(self, email, password=None, first_name=None, last_name=None, date_of_birth=None, phone_number=None, **extra_fields):
       extra_fields.setdefault('is_admin', True)
+      extra_fields.setdefault('is_staff', True)
       user = self.create_user(email, password, first_name, last_name, date_of_birth, phone_number, **extra_fields)
       Admin.objects.create(AdminID=user) # add superuser to the Admin table once created
       return user
@@ -36,6 +37,7 @@ class User(AbstractBaseUser):
     
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
     
     last_login = None
     # is_active = None
@@ -50,6 +52,12 @@ class User(AbstractBaseUser):
         managed = False
         db_table = 'User'
 
+    def has_perm(self, api):
+      return self.is_admin
+    
+    def has_module_perms(self, api):
+      return self.is_admin
+    
     def set_password(self, raw_password):
         self.password = raw_password
         self.save()
