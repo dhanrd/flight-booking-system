@@ -15,7 +15,10 @@ CREATE TABLE User (
     DateOfBirth DATE,
     PhoneNumber VARCHAR(15),
     Email VARCHAR(100) UNIQUE NOT NULL,
-    Password VARCHAR(256) NOT NULL
+    Password VARCHAR(256) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    is_admin BOOLEAN DEFAULT FALSE,
+    is_staff BOOLEAN DEFAULT FALSE
 );
 
 -- Admin Table (Specialized user role)
@@ -114,23 +117,3 @@ CREATE TABLE Payment (
     Amount DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (BookingID) REFERENCES Booking(BookingID) ON DELETE CASCADE
 );
-
--- Add missing is_active to User table
-ALTER TABLE User
-ADD COLUMN is_active BOOLEAN;
-
--- Add missing is_admin to User table
-ALTER TABLE user
-ADD COLUMN is_admin BOOLEAN;
-
--- Add missing is_staff to User table
-ALTER TABLE user
-ADD COLUMN is_staff BOOLEAN;
-
--- Add missing has_module_perms to User table
-ALTER TABLE user
-ADD COLUMN has_module_perms BOOLEAN;
-
--- Remove has_module_perns after debugging session
-ALTER TABLE user
-DROP COLUMN has_module_perms;
