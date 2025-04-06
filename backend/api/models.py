@@ -27,9 +27,14 @@ class UserManager(BaseUserManager):
       return user
 
 class FlightManager(models.Manager):
-  # Define a custom method to return flights based on the departure and arrival airports
+  # Method to return flights based on the departure and arrival airports
   def get_flights_by_airports(self, departure_airport=None, arrival_airport=None):
     return self.filter(departure_airport=departure_airport, arrival_airport=arrival_airport)
+  
+class SeatManager(models.Manager):
+  # Method to return seats based on the Seat Class
+  def get_available_seats(self, flight_id=None, class_type=None):
+    return self.filter(FlightID = flight_id, Class=class_type)
 
 class User(AbstractBaseUser):
     UserID = models.AutoField(primary_key=True, db_column='UserID')
@@ -132,8 +137,7 @@ class Flight(models.Model):
     arrival_time = models.DateTimeField(db_column="ArrivalTime")
     aircraft_id = models.ForeignKey(Aircraft, models.CASCADE, db_column='AircraftID')
     
-    objects = models.Manager()            # Allow us to access all flights
-    flight_objects = FlightManager()  # Allow us to access flights based on airport criteria
+    objects = FlightManager()    # Assign to custom FlightManager
 
     class Meta:
         managed = False
@@ -169,6 +173,8 @@ class Seat(models.Model):
     SeatNumber = models.CharField(max_length=10)
     Class = models.CharField(max_length=15, choices=SEAT_CLASS_CHOICES)
     Price = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    objects = SeatManager()
 
     class Meta:
         managed = False

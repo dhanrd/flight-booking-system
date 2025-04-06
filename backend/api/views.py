@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth import authenticate
-from .models import Booking, Flight, Ticket, User, Passenger
-from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer
+from .models import Booking, Flight, Ticket, User, Passenger, Seat
+from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer, SeatSerializer
 
 class RegisterView(APIView):
     def post(self, request):
@@ -75,11 +75,25 @@ class SearchFlightsView(APIView):
       arrival_airport = request.data.get('arrival_airport')
       
       try:
-        flights = Flight.flight_objects.get_flights_by_airports(departure_airport, arrival_airport) 
-        serializer = FlightSerializer(flights, many=True) # we intend to serialize many flights
+        flights = Flight.objects.get_flights_by_airports(departure_airport, arrival_airport) 
+        serializer = FlightSerializer(flights, many=True) # allow us to serialize many flights
         return Response({ 'available flights' : serializer.data})
       except Flight.DoesNotExist:
         return Response({'error: Flights not found based on provided criteria'}, status=status.HTTP_404_NOT_FOUND)
+      
+class SearchSeatsView(APIView):
+    def post(self, request):
+      flight_id = request.data.get('flight_id')
+      seat_class = request.data.get('seat_class')
+      
+      try:
+        seats = Seat.objects.get_available_seats(flight_id, seat_class) 
+        serializer = SeatSerializer(seats, many=True) # allow us to serialize many seats
+        return Response({
+          'available seats': serializer.data
+        })
+      except Seat.DoesNotExist:
+        return Response({'error: Seats not available for provided class'}, status=status.HTTP_404_NOT_FOUND)
       
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()

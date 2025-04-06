@@ -46,8 +46,8 @@ VALUES
 (1, '4B', 'Business', 3200.00),
 
 -- First Class Seats
-(1, '1A', 'First', 5500.00),
-(1, '1B', 'First', 5500.00),
-(1, '2A', 'First', 5500.00);
+(1, '1A', 'First Class', 5500.00),
+(1, '1B', 'First Class', 5500.00),
+(1, '2A', 'First Class', 5500.00);
 
 
