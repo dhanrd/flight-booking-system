@@ -76,7 +76,7 @@ class SearchFlightsView(APIView):
       
       try:
         flights = Flight.flight_objects.get_flights_by_airports(departure_airport, arrival_airport) 
-        serializer = FlightSerializer(flights, many=True)
+        serializer = FlightSerializer(flights, many=True) # we intend to serialize many flights
         return Response({ 'available flights' : serializer.data})
       except Flight.DoesNotExist:
         return Response({'error: Flights not found based on provided criteria'}, status=status.HTTP_404_NOT_FOUND)

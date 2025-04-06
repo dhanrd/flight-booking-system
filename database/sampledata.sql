@@ -27,33 +27,27 @@ VALUES
 ('JL005', 'HND', 'SYD', '2025-04-12 20:00:00+09:00', '2025-04-13 06:00:00+10:00', 4), -- Tokyo to Sydney
 ('AF006', 'CDG', 'YYC', '2025-04-10 16:00:00+02:00', '2025-04-11 18:00:00-06:00', 5); -- Paris to Calgary
 
--- -- Select all columns from a table
--- SELECT * FROM table_name;
+-- Insert Seats for FlightID 1
+INSERT INTO Seat (FlightID, SeatNumber, Class, Price)
+VALUES 
 
--- -- Select specific columns with a condition
--- SELECT column1, column2 FROM table_name WHERE column3 = 'some_value';
+-- Economy Class Seats
+(1, '20A', 'Economy', 950.00),
+(1, '20B', 'Economy', 950.00),
+(1, '21A', 'Economy', 950.00),
+(1, '21B', 'Economy', 950.00),
+(1, '22A', 'Economy', 950.00),
 
--- -- Count the number of records in a table
--- SELECT COUNT(*) FROM table_name;
 
--- -- Select data sorted by a column
--- SELECT column1, column2 FROM table_name ORDER BY column1 DESC;
+-- Business Class Seats
+(1, '3A', 'Business', 3200.00),
+(1, '3B', 'Business', 3200.00),
+(1, '4A', 'Business', 3200.00),
+(1, '4B', 'Business', 3200.00),
 
--- -- Update a specific column for certain records
--- UPDATE table_name 
--- SET column1 = 'new_value' 
--- WHERE column2 = 'some_condition';
+-- First Class Seats
+(1, '1A', 'First', 5500.00),
+(1, '1B', 'First', 5500.00),
+(1, '2A', 'First', 5500.00);
 
--- -- Update multiple columns at once
--- UPDATE table_name 
--- SET column1 = 'new_value', column2 = 'another_value' 
--- WHERE column3 > 100;
 
--- -- Delete specific records based on a condition
--- DELETE FROM table_name WHERE column1 = 'some_value';
-
--- -- Delete all records from a table (use with caution!)
--- DELETE FROM table_name;
-
--- -- Delete records that meet multiple conditions
--- DELETE FROM table_name WHERE column1 = 'value1' AND column2 < 50;
