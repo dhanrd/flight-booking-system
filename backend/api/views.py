@@ -1,6 +1,7 @@
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAdminUser
 from django.contrib.auth import authenticate
 from .models import Booking, Flight, Ticket, User, Passenger
 from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer
@@ -67,7 +68,19 @@ class LoginView(APIView):
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
+ 
+class SearchFlightsView(APIView):
+    def post(self, request):
+      departure_airport = request.data.get('departure_airport')
+      arrival_airport = request.data.get('arrival_airport')
+      
+      try:
+        flights = Flight.flight_objects.get_flights_by_airports(departure_airport, arrival_airport) 
+        serializer = FlightSerializer(flights, many=True)
+        return Response({ 'available flights' : serializer.data})
+      except Flight.DoesNotExist:
+        return Response({'error: Flights not found based on provided criteria'}, status=status.HTTP_404_NOT_FOUND)
+      
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -75,6 +88,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
+  
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()

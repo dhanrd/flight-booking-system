@@ -27,24 +27,9 @@ class UserManager(BaseUserManager):
       return user
 
 class FlightManager(models.Manager):
-  # Define a custom method to create flights associated with a given aircraft
-  def create_flight(self, aircraft_id, flight_id=None, flight_number=None, departure_airport=None, arrival_airport=None, 
-                    departure_time=None, arrival_time=None):
-     
-    # Instantiate an unsaved instance of the Flight model (Flight Class constructor)
-    flight = self.model(
-      FlightID=flight_id,
-      FlightNumber=flight_number,
-      DepartureAirport=departure_airport,
-      ArrivalAirport=arrival_airport,
-      DepartureTime=departure_time,
-      ArrivalTime=arrival_time,
-      AircraftID=aircraft_id
-    )
-    
-    flight.save(self._db)
-    return flight
-    
+  # Define a custom method to return flights based on the departure and arrival airports
+  def get_flights_by_airports(self, departure_airport=None, arrival_airport=None):
+    return self.filter(departure_airport=departure_airport, arrival_airport=arrival_airport)
 
 class User(AbstractBaseUser):
     UserID = models.AutoField(primary_key=True, db_column='UserID')
@@ -130,24 +115,25 @@ class Passenger(models.Model):
         db_table = 'Passenger'
 
 class Aircraft(models.Model):
-    AircraftID = models.AutoField(primary_key=True)
-    Model = models.CharField(max_length=50)
-    Capacity = models.IntegerField()
+    aircraft_id = models.AutoField(primary_key=True, db_column="AircraftID")
+    model = models.CharField(max_length=50, db_column="Model")
+    capacity = models.IntegerField(db_column="Capacity")
 
     class Meta:
         managed = False
         db_table = 'Aircraft'
 
 class Flight(models.Model):
-    FlightID = models.AutoField(primary_key=True)
-    FlightNumber = models.CharField(max_length=10, unique=True)
-    DepartureAirport = models.CharField(max_length=50)
-    ArrivalAirport = models.CharField(max_length=50)
-    DepartureTime = models.DateTimeField()
-    ArrivalTime = models.DateTimeField()
-    AircraftID = models.ForeignKey(Aircraft, models.CASCADE, db_column='AircraftID')
+    flight_id = models.AutoField(primary_key=True, db_column="FlightID")
+    flight_number = models.CharField(max_length=10, unique=True, db_column="FlightNumber")
+    departure_airport = models.CharField(max_length=50, db_column="DepartureAirport")
+    arrival_airport = models.CharField(max_length=50, db_column="ArrivalAirport")
+    departure_time = models.DateTimeField(db_column="DepartureTime")
+    arrival_time = models.DateTimeField(db_column="ArrivalTime")
+    aircraft_id = models.ForeignKey(Aircraft, models.CASCADE, db_column='AircraftID')
     
-    objects = FlightManager() # flight-specific manager
+    objects = models.Manager()            # Allow us to access all flights
+    flight_objects = FlightManager()  # Allow us to access flights based on airport criteria
 
     class Meta:
         managed = False

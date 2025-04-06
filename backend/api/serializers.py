@@ -51,30 +51,6 @@ class FlightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Flight
         fields = '__all__'
-        
-    def create(self, validated_data):
-      aircraft_data = validated_data.pop('aircraft') # Extract the aircraft data from the validated data
-      
-      # Check if the aircraft_data passed is the id of an existing aircraft or a new aircraft object
-      if is_instance(aircraft_data, int):
-        try:
-          if Aircraft.objects.get(AircraftID=aircraft_data): # check if an aircraft with the given id exists in the database
-            validated_data['aircraft'] = aircraft_data
-        except Aircraft.DoesNotExist:
-          raise serializer.ValidationError("Aircraft with given ID could not be found in the database")
-      elif is_instance(aircraft_data, dict):
-        # Create an instance of the Aircraft model
-        aircraft = Aircraft.objects.create(
-          Model=aircraft_data.get('model'),
-          Capacity=aircraft_data.get('capacity')
-        )
-        
-        # Set the value of the key 'aircraft' to the id of the new Aircraft object
-        validated_data['aircraft'] = aircraft.AircraftID
-      else:
-        raise serializer.ValidationError("Flight does not have an associated aircraft")
-      
-      return Flight.objects.create_flight(**validated_data)
     
 class BookingSerializer(serializers.ModelSerializer):
     class Meta:
