@@ -26,6 +26,16 @@ class UserManager(BaseUserManager):
       Admin.objects.create(AdminID=user) # add superuser to the Admin table once created
       return user
 
+class FlightManager(models.Manager):
+  # Method to return flights based on the departure and arrival airports
+  def get_flights_by_airports(self, departure_airport=None, arrival_airport=None):
+    return self.filter(departure_airport=departure_airport, arrival_airport=arrival_airport)
+  
+class SeatManager(models.Manager):
+  # Method to return seats based on the Seat Class
+  def get_available_seats(self, flight_id=None, class_type=None):
+    return self.filter(FlightID = flight_id, Class=class_type)
+
 class User(AbstractBaseUser):
     UserID = models.AutoField(primary_key=True, db_column='UserID')
     first_name = models.CharField(max_length=50, db_column='FirstName')
@@ -110,22 +120,24 @@ class Passenger(models.Model):
         db_table = 'Passenger'
 
 class Aircraft(models.Model):
-    AircraftID = models.AutoField(primary_key=True)
-    Model = models.CharField(max_length=50)
-    Capacity = models.IntegerField()
+    aircraft_id = models.AutoField(primary_key=True, db_column="AircraftID")
+    model = models.CharField(max_length=50, db_column="Model")
+    capacity = models.IntegerField(db_column="Capacity")
 
     class Meta:
         managed = False
         db_table = 'Aircraft'
 
 class Flight(models.Model):
-    FlightID = models.AutoField(primary_key=True)
-    FlightNumber = models.CharField(max_length=10, unique=True)
-    DepartureAirport = models.CharField(max_length=50)
-    ArrivalAirport = models.CharField(max_length=50)
-    DepartureTime = models.DateTimeField()
-    ArrivalTime = models.DateTimeField()
-    AircraftID = models.ForeignKey(Aircraft, models.CASCADE, db_column='AircraftID')
+    flight_id = models.AutoField(primary_key=True, db_column="FlightID")
+    flight_number = models.CharField(max_length=10, unique=True, db_column="FlightNumber")
+    departure_airport = models.CharField(max_length=50, db_column="DepartureAirport")
+    arrival_airport = models.CharField(max_length=50, db_column="ArrivalAirport")
+    departure_time = models.DateTimeField(db_column="DepartureTime")
+    arrival_time = models.DateTimeField(db_column="ArrivalTime")
+    aircraft_id = models.ForeignKey(Aircraft, models.CASCADE, db_column='AircraftID')
+    
+    objects = FlightManager()    # Assign to custom FlightManager
 
     class Meta:
         managed = False
@@ -161,6 +173,8 @@ class Seat(models.Model):
     SeatNumber = models.CharField(max_length=10)
     Class = models.CharField(max_length=15, choices=SEAT_CLASS_CHOICES)
     Price = models.DecimalField(max_digits=10, decimal_places=2)
+    
+    objects = SeatManager()
 
     class Meta:
         managed = False

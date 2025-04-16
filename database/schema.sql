@@ -1,4 +1,3 @@
-
 -- Create the Airline Booking System Database with checks and settings
 CREATE DATABASE IF NOT EXISTS AirlineBookingSystem
 DEFAULT CHARACTER SET utf8mb4
