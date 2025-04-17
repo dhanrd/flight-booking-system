@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth import authenticate
 from .models import Booking, Flight, Ticket, User, Passenger, Seat
-from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer, SeatSerializer
+from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer, SeatSerializer, BookingSeatSerializer
 
 class RegisterView(APIView):
     def post(self, request):
@@ -112,19 +112,19 @@ class CreateBookingView(APIView):
         
         # Create BookingSeat record once we've creating Booking record to access BookingID
         booking_seat_data = {
-          'booking_id' : flight_booking.BookingID,
+          'booking_id' : flight_booking.booking_id,
           'seat_id' : request.data.get('seat_id')
         }
 
-        bookingseat_serializer = BookingSeatSerializer(data=booking_seat_data)
-        if not bookingseat_serializer.is_valid():
+        booking_seat_serializer = BookingSeatSerializer(data=booking_seat_data)
+        if not booking_seat_serializer.is_valid():
           flight_booking.delete()
           return Response({
             'error' : 'Error occured while reserving seat',
             'details' : bookingseat_serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
     
-        bookingseat_serializer.save()
+        booking_seat_serializer.save()
         
         return Response({
           'message' : 'Flight booking successfully created',
@@ -137,7 +137,10 @@ class CreateBookingView(APIView):
           'details' : str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
     else:
-      return Response(booking_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+      return Response({
+        "error" : "Error while creating booking",
+        "details" : booking_serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
     
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
