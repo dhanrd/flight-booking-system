@@ -121,7 +121,7 @@ class CreateBookingView(APIView):
           flight_booking.delete()
           return Response({
             'error' : 'Error occured while reserving seat',
-            'details' : bookingseat_serializer.errors
+            'details' : booking_seat_serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
     
         booking_seat_serializer.save()
@@ -149,7 +149,10 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
-  
+
+class SeatViewSet(viewsets.ModelViewSet):
+    queryset = Seat.objects.all()
+    serializer_class = SeatSerializer
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
