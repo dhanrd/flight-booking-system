@@ -34,7 +34,8 @@ class FlightManager(models.Manager):
 class SeatManager(models.Manager):
   # Method to return seats based on the Seat Class
   def get_available_seats(self, flight_id=None, class_type=None):
-    return self.filter(FlightID = flight_id, Class=class_type)
+    booked_seats = BookingSeat.objects.values_list('seat_id', flat=True) # get all the seats that are already booked/reserved
+    return self.exclude(SeatID__in=booked_seats) # return only seats that are available
     
 class User(AbstractBaseUser):
     UserID = models.AutoField(primary_key=True, db_column='UserID')
