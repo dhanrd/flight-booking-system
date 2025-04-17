@@ -74,7 +74,7 @@ CREATE TABLE Seat (
     SeatID INT AUTO_INCREMENT PRIMARY KEY,
     FlightID INT NOT NULL,
     SeatNumber VARCHAR(10) NOT NULL,
-    Class ENUM('Economy' 'Business', 'First Class') NOT NULL,
+    Class ENUM('Economy', 'Business', 'First Class') NOT NULL,
     Price DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (FlightID) REFERENCES Flight(FlightID) ON DELETE CASCADE
 );
