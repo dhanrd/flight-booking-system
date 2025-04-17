@@ -79,13 +79,19 @@ class User(AbstractBaseUser):
         return f"{self.first_name} {self.last_name}"
 
 class Admin(models.Model):
+    AUTHORIZATION_LEVEL_CHOICES = [
+      ('SuperAdmin', 'SuperAdmin'),
+      ('GeneralAdmin', 'GeneralAdmin'),
+      ('CustomerSupport', 'CustomerSupport')
+    ]
+    
     AdminID = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         primary_key=True,
         db_column='AdminID'
     )
-    authorization_level = models.CharField(max_length=50, db_column="AuthorizationLevel") # link to MySQL database
+    authorization_level = models.CharField(max_length=50, default="GeneralAdmin", db_column="AuthorizationLevel") # link to MySQL database
 
     class Meta:
         managed = False
