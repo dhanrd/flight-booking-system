@@ -153,7 +153,7 @@ class Booking(models.Model):
     BookingID = models.AutoField(primary_key=True)
     PassengerID = models.ForeignKey(Passenger, models.CASCADE, db_column='PassengerID')
     FlightID = models.ForeignKey(Flight, models.CASCADE, db_column='FlightID')
-    BookingDate = models.DateTimeField(auto_now_add=True)
+    BookingDate = models.DateTimeField(auto_now_add=True, db_column='BookingDate')
     BookingStatus = models.CharField(max_length=10, choices=BOOKING_STATUS_CHOICES)
     AdminID = models.ForeignKey(Admin, models.SET_NULL, null=True, blank=True, db_column='AdminID')
 

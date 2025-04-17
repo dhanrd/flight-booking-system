@@ -95,6 +95,50 @@ class SearchSeatsView(APIView):
       except Seat.DoesNotExist:
         return Response({'error: Seats not available for provided class'}, status=status.HTTP_404_NOT_FOUND)
       
+class CreateBookingView(APIView):
+  def post(self, request):
+    booking_data = {
+      'passenger_id': request.data.get('passenger_id'),
+      'flight_id' : request.data.get('flight_id'),
+      'booking_status' :  request.data.get('booking_status', 'Pending'), # default to 'Pending'
+      'admin_id' : request.data.get('admin_id')
+    }
+    
+    booking_serializer = BookingSerializer(data=booking_data) # pass booking data to BookingSerializer class
+    
+    if booking_serializer.is_valid():
+      try:
+        flight_booking = booking_serializer.save() # save and return Booking record
+        
+        # Create BookingSeat record once we've creating Booking record to access BookingID
+        booking_seat_data = {
+          'booking_id' : flight_booking.BookingID,
+          'seat_id' : request.data.get('seat_id')
+        }
+
+        bookingseat_serializer = BookingSeatSerializer(data=booking_seat_data)
+        if not bookingseat_serializer.is_valid():
+          flight_booking.delete()
+          return Response({
+            'error' : 'Error occured while reserving seat',
+            'details' : bookingseat_serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+    
+        bookingseat_serializer.save()
+        
+        return Response({
+          'message' : 'Flight booking successfully created',
+          'booking details' : booking_serializer.data,
+          'booking seat details' : booking_seat_serializer.data,
+        }, status=status.HTTP_201_CREATED)
+      except Exception as e:
+        return Response({
+          'error' : 'Error occured while creating flight booking',
+          'details' : str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+    else:
+      return Response(booking_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
