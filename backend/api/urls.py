@@ -7,6 +7,7 @@ router.register(r'users', views.UserViewSet)
 router.register(r'flights', views.FlightViewSet)
 router.register(r'bookings', views.BookingViewSet)
 router.register(r'tickets', views.TicketViewSet)
+router.register(r'seats', views.SeatViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
