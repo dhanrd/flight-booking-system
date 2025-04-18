@@ -110,26 +110,32 @@ class CreateBookingView(APIView):
       try:
         flight_booking = booking_serializer.save() # save and return Booking record
         
-        # Create BookingSeat record once we've creating Booking record to access BookingID
-        booking_seat_data = {
-          'booking_id' : flight_booking.booking_id,
-          'seat_id' : request.data.get('seat_id')
-        }
-
-        booking_seat_serializer = BookingSeatSerializer(data=booking_seat_data)
-        if not booking_seat_serializer.is_valid():
-          flight_booking.delete()
-          return Response({
-            'error' : 'Error occured while reserving seat',
-            'details' : booking_seat_serializer.errors
-            }, status=status.HTTP_400_BAD_REQUEST)
-    
-        booking_seat_serializer.save()
+        seats_id = request.data.get('seat_ids', [])
+        booked_seats = []
         
+        for seat_id in seats_id:
+          # Create BookingSeat record once we've creating Booking record to access BookingID
+          booking_seat_data = {
+            'booking_id' : flight_booking.booking_id,
+            'seat_id' : seat_id
+          }
+
+          booking_seat_serializer = BookingSeatSerializer(data=booking_seat_data)
+
+          if not booking_seat_serializer.is_valid():
+            flight_booking.delete()
+            return Response({
+              'error' : 'Error occured while reserving seat',
+              'details' : booking_seat_serializer.errors
+              }, status=status.HTTP_400_BAD_REQUEST)
+      
+          booking_seat_serializer.save()
+          booked_seats.append(booking_seat_serializer.data)
+          
         return Response({
           'message' : 'Flight booking successfully created',
           'booking details' : booking_serializer.data,
-          'booking seat details' : booking_seat_serializer.data,
+          'booking seat details' : booked_seats,
         }, status=status.HTTP_201_CREATED)
       except Exception as e:
         return Response({

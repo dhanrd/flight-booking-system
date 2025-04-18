@@ -189,7 +189,7 @@ class Seat(models.Model):
         db_table = 'Seat'
 
 class BookingSeat(models.Model):
-    booking_id = models.OneToOneField(Booking, models.CASCADE, primary_key=True, db_column='BookingID')
+    booking_id = models.ForeignKey(Booking, on_delete=models.CASCADE, db_column='BookingID')
     seat_id = models.ForeignKey(Seat, models.CASCADE, db_column='SeatID')
 
     class Meta:
