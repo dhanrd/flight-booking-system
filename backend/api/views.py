@@ -1,10 +1,12 @@
+from django.conf import settings
+
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth import authenticate
 from .models import Booking, Flight, Ticket, User, Passenger, Seat
-from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer, SeatSerializer
+from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer, SeatSerializer, BookingSeatSerializer
 
 class RegisterView(APIView):
     def post(self, request):
@@ -95,6 +97,59 @@ class SearchSeatsView(APIView):
       except Seat.DoesNotExist:
         return Response({'error: Seats not available for provided class'}, status=status.HTTP_404_NOT_FOUND)
       
+class CreateBookingView(APIView):
+  def post(self, request):
+    booking_data = {
+      'passenger_id': request.data.get('passenger_id'),
+      'flight_id' : request.data.get('flight_id'),
+      'booking_status' :  request.data.get('booking_status', 'Pending'), # default to 'Pending'
+      'admin_id' : request.data.get('admin_id')
+    }
+    
+    booking_serializer = BookingSerializer(data=booking_data) # pass booking data to BookingSerializer class
+    
+    if booking_serializer.is_valid():
+      try:
+        flight_booking = booking_serializer.save() # save and return Booking record
+        
+        seats_id = request.data.get('seat_ids', [])
+        booked_seats = []
+        
+        for seat_id in seats_id:
+          # Create BookingSeat record once we've creating Booking record to access BookingID
+          booking_seat_data = {
+            'booking_id' : flight_booking.booking_id,
+            'seat_id' : seat_id
+          }
+
+          booking_seat_serializer = BookingSeatSerializer(data=booking_seat_data)
+
+          if not booking_seat_serializer.is_valid():
+            flight_booking.delete()
+            return Response({
+              'error' : 'Error occured while reserving seat',
+              'details' : booking_seat_serializer.errors
+              }, status=status.HTTP_400_BAD_REQUEST)
+      
+          booking_seat_serializer.save()
+          booked_seats.append(booking_seat_serializer.data)
+          
+        return Response({
+          'message' : 'Flight booking successfully created',
+          'booking details' : booking_serializer.data,
+          'booking seat details' : booked_seats,
+        }, status=status.HTTP_201_CREATED)
+      except Exception as e:
+        return Response({
+          'error' : 'Error occured while creating flight booking',
+          'details' : str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)    
+    else:
+      return Response({
+        "error" : "Error while creating booking",
+        "details" : booking_serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -102,7 +157,10 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 class FlightViewSet(viewsets.ModelViewSet):
     queryset = Flight.objects.all()
     serializer_class = FlightSerializer
-  
+
+class SeatViewSet(viewsets.ModelViewSet):
+    queryset = Seat.objects.all()
+    serializer_class = SeatSerializer
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()

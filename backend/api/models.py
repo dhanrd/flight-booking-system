@@ -34,8 +34,10 @@ class FlightManager(models.Manager):
 class SeatManager(models.Manager):
   # Method to return seats based on the Seat Class
   def get_available_seats(self, flight_id=None, class_type=None):
-    return self.filter(FlightID = flight_id, Class=class_type)
-
+    booked_seats = BookingSeat.objects.values_list('seat_id', flat=True) # get all the seats that are already booked/reserved
+    available_seats =  self.exclude(SeatID__in=booked_seats)              # get all seats that are available
+    return available_seats.filter(FlightID=flight_id, Class=class_type)
+    
 class User(AbstractBaseUser):
     UserID = models.AutoField(primary_key=True, db_column='UserID')
     first_name = models.CharField(max_length=50, db_column='FirstName')
@@ -79,13 +81,19 @@ class User(AbstractBaseUser):
         return f"{self.first_name} {self.last_name}"
 
 class Admin(models.Model):
+    AUTHORIZATION_LEVEL_CHOICES = [
+      ('SuperAdmin', 'SuperAdmin'),
+      ('GeneralAdmin', 'GeneralAdmin'),
+      ('CustomerSupport', 'CustomerSupport')
+    ]
+    
     AdminID = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
         primary_key=True,
         db_column='AdminID'
     )
-    authorization_level = models.CharField(max_length=50, db_column="AuthorizationLevel") # link to MySQL database
+    authorization_level = models.CharField(max_length=50, default="GeneralAdmin", db_column="AuthorizationLevel") # link to MySQL database
 
     class Meta:
         managed = False
@@ -150,13 +158,13 @@ class Booking(models.Model):
         ('Cancelled', 'Cancelled'),
     ]
     
-    BookingID = models.AutoField(primary_key=True)
-    PassengerID = models.ForeignKey(Passenger, models.CASCADE, db_column='PassengerID')
-    FlightID = models.ForeignKey(Flight, models.CASCADE, db_column='FlightID')
-    BookingDate = models.DateTimeField(auto_now_add=True)
-    BookingStatus = models.CharField(max_length=10, choices=BOOKING_STATUS_CHOICES)
-    AdminID = models.ForeignKey(Admin, models.SET_NULL, null=True, blank=True, db_column='AdminID')
-
+    booking_id = models.AutoField(primary_key=True, db_column='BookingID')
+    passenger_id= models.ForeignKey(Passenger, models.CASCADE, db_column='PassengerID')
+    flight_id = models.ForeignKey(Flight, models.CASCADE, db_column='FlightID')
+    booking_date = models.DateTimeField(auto_now_add=True, db_column='BookingDate')
+    booking_status = models.CharField(max_length=10, choices=BOOKING_STATUS_CHOICES, db_column='BookingStatus')
+    admin_id = models.ForeignKey(Admin, models.SET_NULL, null=True, blank=True, db_column='AdminID')
+    
     class Meta:
         managed = False
         db_table = 'Booking'
@@ -181,13 +189,13 @@ class Seat(models.Model):
         db_table = 'Seat'
 
 class BookingSeat(models.Model):
-    BookingID = models.OneToOneField(Booking, models.CASCADE, primary_key=True, db_column='BookingID')
-    SeatID = models.ForeignKey(Seat, models.CASCADE, db_column='SeatID')
+    booking_id = models.ForeignKey(Booking, on_delete=models.CASCADE, db_column='BookingID')
+    seat_id = models.ForeignKey(Seat, models.CASCADE, db_column='SeatID')
 
     class Meta:
         managed = False
         db_table = 'BookingSeat'
-        unique_together = (('BookingID', 'SeatID'),)
+        unique_together = (('booking_id', 'seat_id'),)
 
 class Ticket(models.Model):
     CHECK_IN_STATUS_CHOICES = [
