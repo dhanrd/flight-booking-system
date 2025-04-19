@@ -63,6 +63,14 @@ export default function Home() {
     router.push('/login');
   };
 
+  const navigateToBookings = () => {
+    router.push('/bookings');
+  };
+
+  const navigateToMyBookings = () => {
+    router.push('/mybookings');
+  };
+
   // Format date for better display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -105,6 +113,21 @@ export default function Home() {
           <p className="text-gray-600">
             Welcome, {user.first_name} {user.last_name}!
           </p>
+        </div>
+
+        <div className="mt-6 flex gap-6">
+          <button
+            onClick={navigateToBookings}
+            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg"
+          >
+            Book a Flight
+          </button>
+        <button
+            onClick={navigateToMyBookings}
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg"
+          >
+            My Bookings
+          </button>
         </div>
 
         {/* Flights Section */}
