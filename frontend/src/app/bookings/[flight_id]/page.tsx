@@ -76,7 +76,7 @@ export default function SeatSelection() {
     setError('')
     
     try {
-      await axios.post('http://127.0.0.1:8000/api/booking_summary/', {
+      await axios.post('http://127.0.0.1:8000/api/booking_summary', {
         passenger_id: user.UserID,
         flight_id,
         seat_ids: selectedSeats
