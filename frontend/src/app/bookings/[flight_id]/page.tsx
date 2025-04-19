@@ -42,7 +42,7 @@ export default function SeatSelection() {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/search/seats/', {
+      const response = await axios.post('http://127.0.0.1:8000/api/search/seats', {
         flight_id,
         seat_class: seatClass
       });
