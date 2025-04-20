@@ -37,7 +37,7 @@ class SeatManager(models.Manager):
     booked_seats = BookingSeat.objects.values_list('seat_id', flat=True) # get all the seats that are already booked/reserved
     available_seats =  self.exclude(SeatID__in=booked_seats)              # get all seats that are available
     return available_seats.filter(FlightID=flight_id, Class=class_type)
-    
+  
 class User(AbstractBaseUser):
     UserID = models.AutoField(primary_key=True, db_column='UserID')
     first_name = models.CharField(max_length=50, db_column='FirstName')
@@ -191,7 +191,7 @@ class Seat(models.Model):
 class BookingSeat(models.Model):
     booking_id = models.ForeignKey(Booking, on_delete=models.CASCADE, db_column='BookingID')
     seat_id = models.ForeignKey(Seat, models.CASCADE, db_column='SeatID')
-
+    
     class Meta:
         managed = False
         db_table = 'BookingSeat'

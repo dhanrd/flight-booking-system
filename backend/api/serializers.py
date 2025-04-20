@@ -70,12 +70,12 @@ class BookingSerializer(serializers.ModelSerializer):
 class BookingSeatSerializer(serializers.ModelSerializer):
     class Meta:
       model = BookingSeat
-      fields = '__all__'
+      fields = ['booking_id', 'seat_id']
       
-      # Create BookingSeat record
-      def create(self, validated_data):
-        booking_seat = BookingSeat.objects.create(**validated_data)
-        return booking_seat
+    # Create BookingSeat record
+    def create(self, validated_data):
+      booking_seat = BookingSeat.objects.create(**validated_data)
+      return booking_seat
   
 class PaymentSerializer(serializers.ModelSerializer):
   class Meta: 

@@ -16,5 +16,6 @@ urlpatterns = [
     path('search/flights/', views.SearchFlightsView.as_view(), name='search flights'),
     path('search/seats/', views.SearchSeatsView.as_view(), name='search seats'),
     path('booking_summary/', views.CreateBookingView.as_view(), name='booking summary'),
+    path('booked_seats/', views.GetBookedSeatsView.as_view(), name='booked seats'),
     path('checkout/', views.PaymentView.as_view(), name='checkout')
 ]
