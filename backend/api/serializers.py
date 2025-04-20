@@ -91,3 +91,8 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = '__all__'
+    
+    # Create Ticket record
+    def create(self, validated_data):
+      ticket = Ticket.objects.create(**validated_data)
+      return ticket

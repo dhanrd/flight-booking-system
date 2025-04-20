@@ -8,6 +8,8 @@ from django.contrib.auth import authenticate
 from .models import Booking, Flight, Ticket, User, Passenger, Seat, BookingSeat, Payment
 from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer, SeatSerializer, BookingSeatSerializer, PaymentSerializer
 
+import random 
+
 class RegisterView(APIView):
     def post(self, request):
         # Separate user and passenger data
@@ -186,11 +188,36 @@ class PaymentView(APIView):
         booking.save() # save updated Booking record 
       
         booking_serializer = BookingSerializer(booking) # serialize 'booking' model instance
+
+        # Generate Ticket record
+        ticket_data = {
+          'BookingID' : booking.booking_id,
+          'SequenceNumber' : random.randint(100000, 999999),
+          'BoardingGroup' : 'Group ' + random.choice(['A', 'B', 'C', 'D', 'E']),
+          'CheckInStatus' : 'Not Checked In'
+        }
         
+        ticket_serializer = TicketSerializer(data=ticket_data)
+        
+        if ticket_serializer.is_valid():
+          try:
+            ticket_serializer.save() # Save Ticket record to database
+          except Exception as e:
+            return Response({
+              'error' : 'Error occurred while saving ticket to database',
+              'details' : str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else :
+            return Response({
+              "error" : "Error while generating ticket",
+              "details" : ticket_serializer.errors
+              }, status=status.HTTP_400_BAD_REQUEST)
+                    
         return Response({
           'message' : 'Payment made successfully',
           'payment details' : payment_serializer.data,
           'booking details' : booking_serializer.data,
+          'ticket details' : ticket_serializer.data
         }, status=status.HTTP_200_OK)
       except Exception as e:
         return Response({
