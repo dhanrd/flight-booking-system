@@ -24,7 +24,8 @@ frontend/.env.test.local
 frontend/.env.production.local
 frontend/npm-debug.log*
 
-# django
+# virtual environment
+Scripts/
 backend/backend/Lib
 backend/backend/Scripts
 
