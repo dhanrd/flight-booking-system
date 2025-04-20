@@ -17,5 +17,6 @@ urlpatterns = [
     path('search/seats/', views.SearchSeatsView.as_view(), name='search seats'),
     path('booking_summary/', views.CreateBookingView.as_view(), name='booking summary'),
     path('booked_seats/', views.GetBookedSeatsView.as_view(), name='booked seats'),
-    path('checkout/', views.PaymentView.as_view(), name='checkout')
+    path('checkout/', views.PaymentView.as_view(), name='checkout'),
+    path('flight_ticket/', views.GetTicketView.as_view(), name='flight ticket')
 ]

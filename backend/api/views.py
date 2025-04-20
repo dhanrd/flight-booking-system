@@ -202,6 +202,13 @@ class PaymentView(APIView):
         if ticket_serializer.is_valid():
           try:
             ticket_serializer.save() # Save Ticket record to database
+            
+            return Response({
+              'message' : 'Payment made successfully',
+              'payment details' : payment_serializer.data,
+              'booking details' : booking_serializer.data,
+              'ticket details' : ticket_serializer.data
+            }, status=status.HTTP_200_OK)
           except Exception as e:
             return Response({
               'error' : 'Error occurred while saving ticket to database',
@@ -211,14 +218,7 @@ class PaymentView(APIView):
             return Response({
               "error" : "Error while generating ticket",
               "details" : ticket_serializer.errors
-              }, status=status.HTTP_400_BAD_REQUEST)
-                    
-        return Response({
-          'message' : 'Payment made successfully',
-          'payment details' : payment_serializer.data,
-          'booking details' : booking_serializer.data,
-          'ticket details' : ticket_serializer.data
-        }, status=status.HTTP_200_OK)
+              }, status=status.HTTP_400_BAD_REQUEST)         
       except Exception as e:
         return Response({
           'error' : 'Error occured while processing payment',
@@ -229,7 +229,23 @@ class PaymentView(APIView):
         'message' : 'Please check the submitted payment information',
         'details' : payment_serializer.errors
       }, status=status.HTTP_400_BAD_REQUEST)
-          
+      
+class GetTicketView(APIView):
+  def post(self, request):
+    booking_id = request.data.get('booking_id')
+    
+    try:
+      ticket = Ticket.objects.get(BookingID=booking_id)
+      ticket_serializer = TicketSerializer(ticket)
+      return Response({
+        'ticket details' : ticket_serializer.data
+      }, status=status.HTTP_200_OK)
+    except Exception as e:
+      return Response({
+        'error' : 'Error occured while retrieving ticket',
+        'details' : str(e)
+      }, status=status.HTTP_404_NOT_FOUND)
+        
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
