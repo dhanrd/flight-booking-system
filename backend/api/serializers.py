@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Booking, Flight, Ticket, User, Passenger, Admin, Seat, BookingSeat, Payment
+from .models import Booking, Flight, Ticket, User, Passenger, Admin, Seat, BookingSeat, Payment, CheckIn
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -91,3 +91,17 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = '__all__'
+    
+    # Create Ticket record
+    def create(self, validated_data):
+      ticket = Ticket.objects.create(**validated_data)
+      return ticket
+
+class CheckInSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = CheckIn
+    fields = '__all__'
+    
+  def create(self, validated_data):
+    checkInRecord = CheckIn.objects.create(**validated_data)
+    return checkInRecord

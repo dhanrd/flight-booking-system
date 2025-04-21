@@ -6,7 +6,9 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth import authenticate
 from .models import Booking, Flight, Ticket, User, Passenger, Seat, BookingSeat, Payment
-from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer, SeatSerializer, BookingSeatSerializer, PaymentSerializer
+from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer, SeatSerializer, BookingSeatSerializer, PaymentSerializer, CheckInSerializer
+
+import random 
 
 class RegisterView(APIView):
     def post(self, request):
@@ -186,12 +188,37 @@ class PaymentView(APIView):
         booking.save() # save updated Booking record 
       
         booking_serializer = BookingSerializer(booking) # serialize 'booking' model instance
+
+        # Generate Ticket record
+        ticket_data = {
+          'BookingID' : booking.booking_id,
+          'SequenceNumber' : random.randint(100000, 999999),
+          'BoardingGroup' : 'Group ' + random.choice(['A', 'B', 'C', 'D', 'E']),
+          'CheckInStatus' : 'Not Checked In'
+        }
         
-        return Response({
-          'message' : 'Payment made successfully',
-          'payment details' : payment_serializer.data,
-          'booking details' : booking_serializer.data,
-        }, status=status.HTTP_200_OK)
+        ticket_serializer = TicketSerializer(data=ticket_data)
+        
+        if ticket_serializer.is_valid():
+          try:
+            ticket_serializer.save() # Save Ticket record to database
+            
+            return Response({
+              'message' : 'Payment made successfully',
+              'payment details' : payment_serializer.data,
+              'booking details' : booking_serializer.data,
+              'ticket details' : ticket_serializer.data
+            }, status=status.HTTP_200_OK)
+          except Exception as e:
+            return Response({
+              'error' : 'Error occurred while saving ticket to database',
+              'details' : str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else :
+            return Response({
+              "error" : "Error while generating ticket",
+              "details" : ticket_serializer.errors
+              }, status=status.HTTP_400_BAD_REQUEST)         
       except Exception as e:
         return Response({
           'error' : 'Error occured while processing payment',
@@ -202,7 +229,58 @@ class PaymentView(APIView):
         'message' : 'Please check the submitted payment information',
         'details' : payment_serializer.errors
       }, status=status.HTTP_400_BAD_REQUEST)
-          
+      
+class GetTicketView(APIView):
+  def post(self, request):
+    booking_id = request.data.get('booking_id')
+    
+    try:
+      ticket = Ticket.objects.get(BookingID=booking_id)
+      ticket_serializer = TicketSerializer(ticket)
+      return Response({
+        'ticket details' : ticket_serializer.data
+      }, status=status.HTTP_200_OK)
+    except Exception as e:
+      return Response({
+        'error' : 'Error occured while retrieving ticket',
+        'details' : str(e)
+      }, status=status.HTTP_404_NOT_FOUND)
+ 
+class CheckInView(APIView):
+  def post(self, request):
+    check_in_data = {
+      'TicketID' : request.data.get('ticket_id'),
+      'PassengerID' : request.data.get('passenger_id'),
+      'FlightID' : request.data.get('flight_id'),
+      'CheckInStatus' : request.data.get('check_in_status', 'Checked In')
+    }
+    
+    checkInSerializer = CheckInSerializer(data=check_in_data)
+    
+    if checkInSerializer.is_valid():
+      try:
+        checkInRecord = checkInSerializer.save()
+        
+        ticket = checkInRecord.TicketID          # get the associated ticket linked to the current check in 
+        ticket.CheckInStatus = 'Checked In'      # update check in status of the ticket
+        ticket.save()                            # save the updated Ticket record
+        
+        return Response({
+          'message' : 'Passenger has successfully checked in',
+          'check in details' : checkInSerializer.data,
+          'ticket details' : TicketSerializer(ticket).data
+        }) 
+      except Exception as e:
+        return Response({
+          'error' : 'Error occured while updating check-in status',
+          'details' : str(e)
+        })
+    else:
+      return Response({
+        'error' : 'Check-in failed due to invalid data.',
+        'details' : checkInSerializer.errors
+      })    
+      
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
