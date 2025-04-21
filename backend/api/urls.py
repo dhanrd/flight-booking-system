@@ -13,7 +13,9 @@ urlpatterns = [
     path('', include(router.urls)),
     path('register/', views.RegisterView.as_view(), name='register'),
     path('login/', views.LoginView.as_view(), name='login'),
-    path('search/flights', views.SearchFlightsView.as_view(), name='search flights'),
-    path('search/seats', views.SearchSeatsView.as_view(), name='search seats'),
-    path('booking_summary', views.CreateBookingView.as_view(), name='booking summary')
+    path('search/flights/', views.SearchFlightsView.as_view(), name='search flights'),
+    path('search/seats/', views.SearchSeatsView.as_view(), name='search seats'),
+    path('booking_summary/', views.CreateBookingView.as_view(), name='booking summary'),
+    path('booked_seats/', views.GetBookedSeatsView.as_view(), name='booked seats'),
+    path('checkout/', views.PaymentView.as_view(), name='checkout')
 ]

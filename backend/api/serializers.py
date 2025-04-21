@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Booking, Flight, Ticket, User, Passenger, Admin, Seat, BookingSeat
+from .models import Booking, Flight, Ticket, User, Passenger, Admin, Seat, BookingSeat, Payment
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -70,13 +70,23 @@ class BookingSerializer(serializers.ModelSerializer):
 class BookingSeatSerializer(serializers.ModelSerializer):
     class Meta:
       model = BookingSeat
-      fields = '__all__'
+      fields = ['booking_id', 'seat_id']
       
-      # Create BookingSeat record
-      def create(self, validated_data):
-        booking_seat = BookingSeat.objects.create(**validated_data)
-        return booking_seat
-      
+    # Create BookingSeat record
+    def create(self, validated_data):
+      booking_seat = BookingSeat.objects.create(**validated_data)
+      return booking_seat
+  
+class PaymentSerializer(serializers.ModelSerializer):
+  class Meta: 
+    model = Payment
+    fields = '__all__'    
+    
+    # Create Payment record
+    def create(self, validated_data):
+      payment = Payment.objects.create(**validated_data)
+      return payment
+    
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
