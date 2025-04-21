@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth import authenticate
 from .models import Booking, Flight, Ticket, User, Passenger, Seat, BookingSeat, Payment
-from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer, SeatSerializer, BookingSeatSerializer, PaymentSerializer
+from .serializers import BookingSerializer, TicketSerializer, UserSerializer, PassengerSerializer, FlightSerializer, SeatSerializer, BookingSeatSerializer, PaymentSerializer, CheckInSerializer
 
 import random 
 
@@ -245,7 +245,42 @@ class GetTicketView(APIView):
         'error' : 'Error occured while retrieving ticket',
         'details' : str(e)
       }, status=status.HTTP_404_NOT_FOUND)
+ 
+class CheckInView(APIView):
+  def post(self, request):
+    check_in_data = {
+      'TicketID' : request.data.get('ticket_id'),
+      'PassengerID' : request.data.get('passenger_id'),
+      'FlightID' : request.data.get('flight_id'),
+      'CheckInStatus' : request.data.get('check_in_status', 'Checked In')
+    }
+    
+    checkInSerializer = CheckInSerializer(data=check_in_data)
+    
+    if checkInSerializer.is_valid():
+      try:
+        checkInRecord = checkInSerializer.save()
         
+        ticket = checkInRecord.TicketID          # get the associated ticket linked to the current check in 
+        ticket.CheckInStatus = 'Checked In'      # update check in status of the ticket
+        ticket.save()                            # save the updated Ticket record
+        
+        return Response({
+          'message' : 'Passenger has successfully checked in',
+          'check in details' : checkInSerializer.data,
+          'ticket details' : TicketSerializer(ticket).data
+        }) 
+      except Exception as e:
+        return Response({
+          'error' : 'Error occured while updating check-in status',
+          'details' : str(e)
+        })
+    else:
+      return Response({
+        'error' : 'Check-in failed due to invalid data.',
+        'details' : checkInSerializer.errors
+      })    
+      
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer

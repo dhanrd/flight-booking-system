@@ -221,6 +221,7 @@ class CheckIn(models.Model):
     ]
     
     CheckInID = models.AutoField(primary_key=True)
+    TicketID = models.ForeignKey(Ticket, models.CASCADE, db_column='TicketID')
     PassengerID = models.ForeignKey(Passenger, models.CASCADE, db_column='PassengerID')
     FlightID = models.ForeignKey(Flight, models.CASCADE, db_column='FlightID')
     CheckInStatus = models.CharField(max_length=15, choices=CHECK_IN_STATUS_CHOICES)

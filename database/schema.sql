@@ -102,9 +102,11 @@ CREATE TABLE Ticket (
 -- CheckIn Table (Tracks passengers checking into flights)
 CREATE TABLE CheckIn (
     CheckInID INT AUTO_INCREMENT PRIMARY KEY,
+    TicketID INT NOT NULL,
     PassengerID INT NOT NULL,
     FlightID INT NOT NULL,
     CheckInStatus ENUM('Checked In', 'Not Checked In') NOT NULL,
+    FOREIGN KEY (TicketID) REFERENCES Ticket(TicketID) ON DELETE CASCADE,
     FOREIGN KEY (PassengerID) REFERENCES Passenger(PassengerID) ON DELETE CASCADE,
     FOREIGN KEY (FlightID) REFERENCES Flight(FlightID) ON DELETE CASCADE
 );
