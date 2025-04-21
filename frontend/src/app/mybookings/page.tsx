@@ -189,6 +189,17 @@ export default function MyBookings() {
                             </div>
                           </div>
                         )}
+  
+                        <div className="mt-6">
+                        {booking.booking_status === 'Pending' && (
+                          <button 
+                            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg"
+                            onClick={() => router.push(`/checkout/${booking.booking_id}?totalPrice=${booking.totalPrice}`)}
+                          >
+                            Pay Booking
+                          </button>
+                        )}
+                        </div>
                       </>
                     )}
                   </div>
