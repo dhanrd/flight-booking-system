@@ -17,7 +17,9 @@ CREATE TABLE User (
     Password VARCHAR(256) NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     is_admin BOOLEAN DEFAULT FALSE,
-    is_staff BOOLEAN DEFAULT FALSE
+    is_staff BOOLEAN DEFAULT FALSE, 
+    is_superuser BOOLEAN DEFAULT FALSE,
+    last_login DATETIME NULL
 );
 
 -- Admin Table (Specialized user role)

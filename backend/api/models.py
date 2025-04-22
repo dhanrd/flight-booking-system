@@ -1,6 +1,6 @@
 from django.db import models
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, first_name=None, last_name=None, date_of_birth=None, phone_number=None, **extra_fields):
@@ -22,6 +22,8 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password=None, first_name=None, last_name=None, date_of_birth=None, phone_number=None, **extra_fields):
       extra_fields.setdefault('is_admin', True)
       extra_fields.setdefault('is_staff', True)
+      extra_fields.setdefault('is_superuser', True)
+      
       user = self.create_user(email, password, first_name, last_name, date_of_birth, phone_number, **extra_fields)
       Admin.objects.create(AdminID=user) # add superuser to the Admin table once created
       return user
@@ -38,7 +40,7 @@ class SeatManager(models.Manager):
     available_seats =  self.exclude(SeatID__in=booked_seats)              # get all seats that are available
     return available_seats.filter(FlightID=flight_id, Class=class_type)
   
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     UserID = models.AutoField(primary_key=True, db_column='UserID')
     first_name = models.CharField(max_length=50, db_column='FirstName')
     last_name = models.CharField(max_length=50, db_column='LastName')
@@ -50,13 +52,12 @@ class User(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+    is_superuser = models.BooleanField(default=False)
     
-    last_login = None
-    # is_active = None
-    # is_admin = None
+    last_login = models.DateTimeField(blank=True, null=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name']
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'date_of_birth', 'phone_number'] # require all fields when signing up to avoid null values in admin setup
 
     objects = UserManager()
 
@@ -81,12 +82,6 @@ class User(AbstractBaseUser):
         return f"{self.first_name} {self.last_name}"
 
 class Admin(models.Model):
-    AUTHORIZATION_LEVEL_CHOICES = [
-      ('SuperAdmin', 'SuperAdmin'),
-      ('GeneralAdmin', 'GeneralAdmin'),
-      ('CustomerSupport', 'CustomerSupport')
-    ]
-    
     AdminID = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -98,6 +93,9 @@ class Admin(models.Model):
     class Meta:
         managed = False
         db_table = 'Admin'
+    
+    def __str__(self):
+      return f"{self.AdminID.first_name} {self.AdminID.last_name}"
 
 class Passenger(models.Model):
     PassengerID = models.OneToOneField(
@@ -126,6 +124,9 @@ class Passenger(models.Model):
     class Meta:
         managed = False
         db_table = 'Passenger'
+        
+    def __str__(self):
+      return f"{self.PassengerID.first_name} {self.PassengerID.last_name}"
 
 class Aircraft(models.Model):
     aircraft_id = models.AutoField(primary_key=True, db_column="AircraftID")
@@ -135,6 +136,9 @@ class Aircraft(models.Model):
     class Meta:
         managed = False
         db_table = 'Aircraft'
+    
+    def __str__(self):
+      return f"{self.model}"
 
 class Flight(models.Model):
     flight_id = models.AutoField(primary_key=True, db_column="FlightID")
@@ -150,6 +154,9 @@ class Flight(models.Model):
     class Meta:
         managed = False
         db_table = 'Flight'
+    
+    def __str__(self):
+      return f"{self.flight_number}"
 
 class Booking(models.Model):
     BOOKING_STATUS_CHOICES = [
@@ -169,6 +176,9 @@ class Booking(models.Model):
         managed = False
         db_table = 'Booking'
 
+    def __str__(self):
+      return f"Booking ID: {self.booking_id}"
+    
 class Seat(models.Model):
     SEAT_CLASS_CHOICES = [
         ('Economy', 'Economy'),
