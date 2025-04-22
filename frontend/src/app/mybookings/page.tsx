@@ -190,15 +190,23 @@ export default function MyBookings() {
                           </div>
                         )}
   
-                        <div className="mt-6">
-                        {booking.booking_status === 'Pending' && (
-                          <button 
-                            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg"
-                            onClick={() => router.push(`/checkout/${booking.booking_id}?totalPrice=${booking.totalPrice}`)}
-                          >
-                            Pay Booking
-                          </button>
-                        )}
+                        <div className="mt-6 flex gap-4">
+                          {booking.booking_status === 'Pending' && (
+                            <button 
+                              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg"
+                              onClick={() => router.push(`/checkout/${booking.booking_id}?totalPrice=${booking.totalPrice}`)}
+                            >
+                              Pay Booking
+                            </button>
+                          )}
+                          {booking.booking_status === 'Confirmed' && (
+                            <button 
+                              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
+                              onClick={() => router.push(`/ticket/${booking.booking_id}`)}
+                            >
+                              View Ticket
+                            </button>
+                          )}
                         </div>
                       </>
                     )}
