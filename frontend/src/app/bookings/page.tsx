@@ -61,7 +61,7 @@ export default function BookingSearch() {
     setSearchResults([]);
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/search/flights', searchParams);
+      const response = await axios.post('http://127.0.0.1:8000/api/search/flights/', searchParams);
       
       if (response.data && response.data['available flights']) {
         setSearchResults(response.data['available flights']);

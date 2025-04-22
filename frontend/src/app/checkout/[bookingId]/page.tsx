@@ -107,10 +107,16 @@ export default function CheckoutPage() {
 
           {/* Payment Status Feedback */}
           {paymentStatus === 'success' && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-              Payment confirmed!
-            </div>
-          )}
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+            Payment confirmed!{' '}
+            <a 
+              href={`/ticket/${bookingId}`}
+              className="text-green-800 font-semibold underline hover:text-green-900"
+            >
+              View Ticket
+            </a>
+          </div>
+        )}
           
           {paymentStatus === 'error' && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
