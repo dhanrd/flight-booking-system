@@ -36,6 +36,12 @@ then import the database schema:
 mysql -u root -p AirlineBookingSystem < database/schema.sql
 ```
 
+then import the sample data into the database:
+```bash
+# import from our sample data sql file
+mysql -u root -p AirlineBookingSystem < database/sampledata.sql
+```
+
 ### 3. configure environment variables
 
 Create a `.env` file in the project root directory by copying the example file:
@@ -99,7 +105,13 @@ when you need to make changes to the database:
 After starting the server, these endpoints will be available:
 
 - http://127.0.0.1:8000/admin/ - Admin interface (if you created a superuser)
-- http://127.0.0.1:8000/api/users/ - User operations
-- http://127.0.0.1:8000/api/flights/ - Flight operations
-- http://127.0.0.1:8000/api/bookings/ - Booking operations
-- http://127.0.0.1:8000/api/tickets/ - Ticket operations
+- http://127.0.0.1:8000/api/register/ - User Registration
+- http://127.0.0.1:8000/api/login/ - User Login
+- http://127.0.0.1:8000/api/search/flights/ - Search flights operations
+- http://127.0.0.1:8000/api/search/seats/ - Search seats operations
+- http://127.0.0.1:8000/api/booking_summary/ - Flight Booking Summary
+- http://127.0.0.1:8000/api/booked_seats/ - Booked Seats Summary
+- http://127.0.0.1:8000/api/checkout/ - Checkout/Payment operations
+- http://127.0.0.1:8000/api/flight_ticket/ - Flight Ticket Summary
+- http://127.0.0.1:8000/api/check_in/ - User Check in 
+
