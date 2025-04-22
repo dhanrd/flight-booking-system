@@ -18,13 +18,9 @@ CREATE TABLE User (
     is_active BOOLEAN DEFAULT TRUE,
     is_admin BOOLEAN DEFAULT FALSE,
     is_staff BOOLEAN DEFAULT FALSE, 
-    -- is_superuser BOOLEAN DEFAULT FALSE,
-    -- last_login DATETIME NULL
+    is_superuser BOOLEAN DEFAULT FALSE,
+    last_login DATETIME NULL
 );
-
-ALTER TABLE USER
-    ADD COLUMN is_superuser BOOLEAN DEFAULT FALSE,
-    ADD COLUMN last_login DATETIME NULL
 
 -- Admin Table (Specialized user role)
 CREATE TABLE Admin (
