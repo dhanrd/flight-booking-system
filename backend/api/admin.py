@@ -1,12 +1,10 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from .models import User, Admin, Flight, Aircraft, Booking
 from django.http import HttpRequest
 
 # Register your models here.
-class UserAdmin(BaseUserAdmin):
-  model = User
+class UserAdmin(admin.ModelAdmin):
   
   # Editing a new user in admin
   fieldsets = (
@@ -22,7 +20,7 @@ class UserAdmin(BaseUserAdmin):
   
 class SystemAdmin(admin.ModelAdmin):
   list_display = ('AdminID','authorization_level',)
-  search_display = ('authorization_level',)
+  search_display = ('AdminID','authorization_level')
   
 class FlightAdmin(admin.ModelAdmin):
   list_display = ('flight_number', 'departure_airport', 'arrival_airport', 'departure_time', 'arrival_time', 'aircraft_id')
@@ -31,9 +29,11 @@ class FlightAdmin(admin.ModelAdmin):
 
 class AircraftAdmin(admin.ModelAdmin):
   list_display = ('model', 'capacity')
+  search_display = ('model',)
  
 class BookingAdmin(admin.ModelAdmin):
   list_display = ('booking_id', 'passenger_id', 'flight_id', 'booking_date', 'booking_status')
+  search_display = ('booking_id', 'passenger_id', 'flight_id,')
   
   def get_queryset(self, request: HttpRequest):
     qs = super().get_queryset(request) # retrieve all Booking objects
