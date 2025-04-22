@@ -82,12 +82,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return f"{self.first_name} {self.last_name}"
 
 class Admin(models.Model):
-    AUTHORIZATION_LEVEL_CHOICES = [
-      ('SuperAdmin', 'SuperAdmin'),
-      ('GeneralAdmin', 'GeneralAdmin'),
-      ('CustomerSupport', 'CustomerSupport')
-    ]
-    
     AdminID = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
