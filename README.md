@@ -30,7 +30,7 @@ CREATE DATABASE AirlineBookingSystem;
 exit
 ```
 
-then import the database schema:
+import the database schema:
 ```bash
 # import from our sql file
 mysql -u root -p AirlineBookingSystem < database/schema.sql
