@@ -48,7 +48,7 @@ Create a `.env` file in the project root directory by copying the example file:
 
 ```bash
 # From the project root
-cp .env.example .env
+cp .env_example .env
 ```
 
 Then edit the `.env` file to update your database credentials:
