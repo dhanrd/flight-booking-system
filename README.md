@@ -1,4 +1,4 @@
-# flight booking system - local setup
+# Flight Booking System - local setup
 
 ## setup steps
 
